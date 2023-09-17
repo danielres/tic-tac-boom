@@ -14,7 +14,7 @@
   const moves: Writable<Move[]> = writable([])
   const lastMove: Readable<Move> = derived(moves, ($moves) => $moves[$moves.length - 1])
   const turn: Readable<Player> = derived(moves, ($moves) => ($moves.length % 2 === 0 ? 'x' : 'o'))
-  const metaboard = derived([moves], ([$moves]) => {
+  const metaboard: Readable<Board[]> = derived([moves], ([$moves]) => {
     const mb: Board[] = Array.from({ length: 9 }).map(() => Array.from({ length: 9 }))
     for (const move of $moves) {
       mb[move[1]][move[2]] = move[0]
