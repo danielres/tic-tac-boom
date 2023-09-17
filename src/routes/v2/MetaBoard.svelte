@@ -82,34 +82,36 @@
   <Lines class="opacity-20" />
 
   <div class="metaboard">
-    {#each $metaboard as board, idx}
-      {@const dimmed = $globalWin || ($currentBoard !== undefined && $currentBoard !== idx)}
+    {#each $metaboard as board, boardIdx}
+      {@const dimmed = $globalWin || ($currentBoard !== undefined && $currentBoard !== boardIdx)}
 
       <Stack class="p-4">
-        <Stack class={$localWins[idx] ? 'opacity-20' : ''}>
+        <Stack class={$localWins[boardIdx] ? 'opacity-20' : ''}>
           <Lines class={dimmed ? 'opacity-40' : ''} />
 
-          <div class="board relative" class:current={!$globalWin && $currentBoard === idx}>
-            {#each board as cell, c}
-              {@const disabled = !!($globalWin || cell)}
-              <button
-                {disabled}
-                class="cell {cell ? 'opacity-100' : 'opacity-0 hover:opacity-60'}"
-                on:click={() => onClick(idx, c)}
-              >
-                {#if cell}
+          <div class="board relative">
+            {#each board as cell, cellIdx}
+              {#if cell}
+                <div class="cell">
                   <Player player={cell} />
-                {:else if !$globalWin}
+                </div>
+              {:else if dimmed || $globalWin}
+                <div class="cell" />
+              {:else}
+                <button
+                  class="cell opacity-0 hover:opacity-60"
+                  on:click={() => onClick(boardIdx, cellIdx)}
+                >
                   <Player player={$turn} />
-                {/if}
-              </button>
+                </button>
+              {/if}
             {/each}
           </div>
         </Stack>
 
-        {#if $localWins[idx]}
+        {#if $localWins[boardIdx]}
           <div class="localWin">
-            <Player player={$localWins[idx]} />
+            <Player player={$localWins[boardIdx]} />
           </div>
         {/if}
       </Stack>
