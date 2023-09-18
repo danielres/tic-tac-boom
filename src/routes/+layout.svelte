@@ -3,7 +3,7 @@
 </script>
 
 <ul>
-  {#each Array.from({ length: 2 }) as e, i}
+  {#each Array(2) as _, i}
     <li>
       <a href="/v{i + 1}">v{i + 1}</a>
     </li>
