@@ -14,10 +14,10 @@
 
 <style lang="postcss">
   ul {
-    @apply flex gap-4;
+    @apply flex gap-2 mb-4 bg-black p-2;
   }
 
   a {
-    @apply btn variant-ghost-primary;
+    @apply btn-sm variant-ghost-primary;
   }
 </style>
