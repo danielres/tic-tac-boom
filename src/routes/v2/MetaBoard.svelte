@@ -12,13 +12,13 @@
   const WINS = [ [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6], ]
 
   const moves: Writable<Move[]> = writable([])
+  const movesUndone: Writable<Move[]> = writable([])
+
   const lastMove: Readable<Move> = derived(moves, ($moves) => $moves[$moves.length - 1])
   const turn: Readable<Player> = derived(moves, ($moves) => ($moves.length % 2 === 0 ? 'x' : 'o'))
   const metaboard: Readable<Board[]> = derived([moves], ([$moves]) => {
     const mb: Board[] = Array.from({ length: 9 }).map(() => Array.from({ length: 9 }))
-    for (const move of $moves) {
-      mb[move[1]][move[2]] = move[0]
-    }
+    for (const move of $moves) mb[move[1]][move[2]] = move[0]
     return mb
   })
 
@@ -55,21 +55,41 @@
     if ($localWins[board]) return // Ensure the clicked board is not won
     if ($currentBoard !== undefined && $currentBoard !== board) return // If there's a currentBoard, ensure the clicked board is the correct one
     $moves = [...$moves, [$turn, board, cell]]
+    $movesUndone = []
   }
 
   function reset() {
     $moves = []
+    $movesUndone = []
+  }
+
+  function undo() {
+    if (!$moves.length) return
+    const undone = $moves[$moves.length - 1]
+    $movesUndone = [...$movesUndone, undone]
+    $moves = $moves.slice(0, -1)
+  }
+
+  function redo() {
+    if (!$movesUndone.length) return
+    $moves = [...$moves, $movesUndone[$movesUndone.length - 1]]
+    $movesUndone = $movesUndone.slice(0, -1)
   }
 
   function loadGame() {
     // prettier-ignore
     $moves = [["o",4,4],["x",4,7],["o",7,5],["x",5,3],["o",3,5],["x",5,4],["o",4,8],["x",8,3],["o",3,4],["x",4,0],["o",0,4],["x",4,2],["o",2,5],["x",5,5],["o",3,3],["x",4,1],["o",1,7],["x",7,8],["o",8,8],["x",8,2],["o",2,6],["x",6,4],["o",6,5],["x",7,4],["o",7,0],["x",0,8],["o",8,0],["x",0,6],["o",6,8],["x",8,6],["o",6,2],["x",2,4],["o",7,1],["x",1,4],["o",7,2],["x",2,7]]
+    $movesUndone = []
   }
 </script>
 
 <div class="flex gap-2 mb-4">
-  <button class="btn variant-ghost-surface" on:click={() => loadGame()}>Load</button>
-  <button class="btn variant-ghost-surface" on:click={() => reset()}>Reset</button>
+  <button class="btn variant-ghost-surface" on:click={loadGame}>Load</button>
+  <button class="btn variant-ghost-surface" on:click={reset}>Reset</button>
+  <button class="btn variant-ghost-surface" on:click={undo} disabled={!$moves.length}>Undo</button>
+  <button class="btn variant-ghost-surface" on:click={redo} disabled={!$movesUndone.length}>
+    Redo
+  </button>
   {#if $globalWin}
     <div class="ml-auto flex variant-ghost-success place-items-center px-4 gap-4">
       <div class="text-success-300">Winner:</div>
