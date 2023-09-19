@@ -5,6 +5,7 @@
   import Lines from './Lines.svelte'
   import Player from './Player.svelte'
   import Stack from './Stack.svelte'
+  import Modal from './Modal.svelte'
 
   import { useMetaBoard } from '$lib/useMetaBoard'
 
@@ -26,12 +27,23 @@
 </script>
 
 {#if $globalWin}
-  <div class="ml-auto flex variant-ghost-success place-items-center p-4 gap-4 text-success-300">
-    <span>Winner:</span>
-    <Player player={$globalWin} class="h-6 text-success-100" />
-  </div>
+  <Modal variant="variant-soft-success">
+    <h3 class="h3">Congratulations!</h3>
+    <p class="flex gap-2 justify-center items-center">
+      <Player class="w-8" />
+      <span>won the round</span>
+    </p>
+    <button type="button" class="btn variant-soft-success" on:click={() => reset(false)}>
+      New Round
+    </button>
+  </Modal>
 {:else if $legalCells.length === 0}
-  <div class="variant-ghost-warning p-4 text-warning-300 text-center font-bold">It's a draw!</div>
+  <Modal variant="variant-soft-surface">
+    <h3 class="h3">It's a draw!</h3>
+    <button type="button" class="btn variant-soft-surface" on:click={() => reset(false)}>
+      New Round
+    </button>
+  </Modal>
 {/if}
 
 <button class="" use:popup={{ event: 'click', target: 'popupActions', placement: 'bottom' }}>
@@ -83,11 +95,14 @@
   <div class="grid gap-2">
     <button class="btn variant-ghost" on:click={undo} disabled={!$moves.length}>Undo</button>
     <button class="btn variant-ghost" on:click={redo} disabled={!$movesUndone.length}>Redo</button>
-    <button class="btn variant-ghost" on:click={reset} disabled={!$moves.length}>Reset</button>
+    <button class="btn variant-ghost" on:click={() => reset()} disabled={!$moves.length}>
+      Reset
+    </button>
     {#if dev}
-      <button class="btn variant-ghost" on:click={() => loadGame()}>Load game</button>
-      <button class="btn variant-ghost" on:click={() => loadGame('win')}>Load win</button>
-      <button class="btn variant-ghost" on:click={() => loadGame('draw')}>Load draw</button>
+      <hr class="my-2" />
+      <button class="btn variant-ghost-error" on:click={() => loadGame()}>Load game</button>
+      <button class="btn variant-ghost-error" on:click={() => loadGame('win')}>Load win</button>
+      <button class="btn variant-ghost-error" on:click={() => loadGame('draw')}>Load draw</button>
     {/if}
   </div>
   <div class="arrow bg-surface-100-800-token" />

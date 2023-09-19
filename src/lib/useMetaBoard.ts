@@ -90,8 +90,8 @@ export function useMetaBoard() {
     movesUndone.set([])
   }
 
-  function reset() {
-    if (!confirm('Are you sure you want to reset the board?')) return
+  function reset(confirmation = true) {
+    if (confirmation && !confirm('Are you sure you want to reset the board?')) return
     moves.set([])
     movesUndone.set([])
   }
