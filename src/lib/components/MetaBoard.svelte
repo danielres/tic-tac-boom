@@ -108,10 +108,14 @@
     $movesUndone = $movesUndone.slice(0, -1)
   }
 
-  function loadGame() {
-    // prettier-ignore
-    $moves = [["o",4,4],["x",4,7],["o",7,5],["x",5,3],["o",3,5],["x",5,4],["o",4,8],["x",8,3],["o",3,4],["x",4,0],["o",0,4],["x",4,2],["o",2,5],["x",5,5],["o",3,3],["x",4,1],["o",1,7],["x",7,8],["o",8,8],["x",8,2],["o",2,6],["x",6,4],["o",6,5],["x",7,4],["o",7,0],["x",0,8],["o",8,0],["x",0,6],["o",6,8],["x",8,6],["o",6,2],["x",2,4],["o",7,1],["x",1,4],["o",7,2],["x",2,7]]
+  function loadGame(kind: 'win' | 'draw' | 'game' = 'game') {
     $movesUndone = []
+    // prettier-ignore
+    if (kind === 'win') $moves =  [["o",4,4],["x",4,7],["o",7,5],["x",5,3],["o",3,5],["x",5,4],["o",4,8],["x",8,3],["o",3,4],["x",4,0],["o",0,4],["x",4,2],["o",2,5],["x",5,5],["o",3,3],["x",4,1],["o",1,7],["x",7,8],["o",8,8],["x",8,2],["o",2,6],["x",6,4],["o",6,5],["x",7,4],["o",7,0],["x",0,8],["o",8,0],["x",0,6],["o",6,8],["x",8,6],["o",6,2],["x",2,4],["o",7,1],["x",1,4],["o",7,2],["x",2,7],["x",0,1],["o",1,5],["x",0,5],["o",0,7],["x",8,1],["o",1,1],["x",1,8],["o",8,4]]
+    // prettier-ignore
+    if (kind === 'draw') $moves = []
+    // prettier-ignore
+    if (kind === 'game') $moves = [["o",4,4],["x",4,7],["o",7,5],["x",5,3],["o",3,5],["x",5,4],["o",4,8],["x",8,3],["o",3,4],["x",4,0],["o",0,4],["x",4,2],["o",2,5],["x",5,5],["o",3,3],["x",4,1],["o",1,7],["x",7,8],["o",8,8],["x",8,2],["o",2,6],["x",6,4],["o",6,5],["x",7,4],["o",7,0],["x",0,8],["o",8,0],["x",0,6],["o",6,8],["x",8,6],["o",6,2],["x",2,4],["o",7,1],["x",1,4],["o",7,2],["x",2,7]]
   }
 </script>
 
@@ -175,11 +179,17 @@
     <button class="btn variant-ghost" on:click={redo} disabled={!$movesUndone.length}>Redo</button>
     <button class="btn variant-ghost" on:click={reset} disabled={!$moves.length}>Reset</button>
     {#if dev}
-      <button class="btn variant-ghost" on:click={loadGame}>Load</button>
+      <button class="btn variant-ghost" on:click={() => loadGame()}>Load game</button>
+      <button class="btn variant-ghost" on:click={() => loadGame('win')}>Load win</button>
+      <button class="btn variant-ghost" on:click={() => loadGame('draw')}>Load draw</button>
     {/if}
   </div>
   <div class="arrow bg-surface-100-800-token" />
 </div>
+
+{#if dev}
+  {JSON.stringify($moves)}
+{/if}
 
 <style lang="postcss">
   .metaboard {
