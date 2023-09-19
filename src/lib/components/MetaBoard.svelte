@@ -1,5 +1,8 @@
 <script lang="ts">
+  import { dev } from '$app/environment'
+  import { popup } from '@skeletonlabs/skeleton'
   import { derived, writable, type Readable, type Writable } from 'svelte/store'
+  import Icon from './Icon.svelte'
   import Lines from './Lines.svelte'
   import Player from './Player.svelte'
   import Stack from './Stack.svelte'
@@ -59,6 +62,7 @@
   }
 
   function reset() {
+    if (!confirm('Are you sure you want to reset the board?')) return
     $moves = []
     $movesUndone = []
   }
@@ -83,20 +87,16 @@
   }
 </script>
 
-<div class="flex gap-2 mb-4">
-  <button class="btn variant-ghost-surface" on:click={loadGame}>Load</button>
-  <button class="btn variant-ghost-surface" on:click={reset}>Reset</button>
-  <button class="btn variant-ghost-surface" on:click={undo} disabled={!$moves.length}>Undo</button>
-  <button class="btn variant-ghost-surface" on:click={redo} disabled={!$movesUndone.length}>
-    Redo
-  </button>
-  {#if $globalWin}
-    <div class="ml-auto flex variant-ghost-success place-items-center px-4 gap-4">
-      <div class="text-success-300">Winner:</div>
-      <Player player={$globalWin} class="h-6 text-success-100" />
-    </div>
-  {/if}
-</div>
+<button class="" use:popup={{ event: 'click', target: 'popupActions', placement: 'bottom' }}>
+  <Icon name="bars-3" size="w-8" />
+</button>
+
+{#if $globalWin}
+  <div class="ml-auto flex variant-ghost-success place-items-center px-4 gap-4">
+    <div class="text-success-300">Winner:</div>
+    <Player player={$globalWin} class="h-6 text-success-100" />
+  </div>
+{/if}
 
 <Stack>
   <Lines class="opacity-20" />
@@ -138,6 +138,18 @@
     {/each}
   </div>
 </Stack>
+
+<div class="card p-4 w-72 shadow-xl" data-popup="popupActions">
+  <div class="grid gap-2">
+    <button class="btn variant-ghost" on:click={undo} disabled={!$moves.length}>Undo</button>
+    <button class="btn variant-ghost" on:click={redo} disabled={!$movesUndone.length}>Redo</button>
+    <button class="btn variant-ghost" on:click={reset} disabled={!$moves.length}>Reset</button>
+    {#if dev}
+      <button class="btn variant-ghost" on:click={loadGame}>Load</button>
+    {/if}
+  </div>
+  <div class="arrow bg-surface-100-800-token" />
+</div>
 
 <style lang="postcss">
   .metaboard {
