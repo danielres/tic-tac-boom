@@ -3,7 +3,7 @@
   import { Avatar, ProgressRadial, popup, storePopup } from '@skeletonlabs/skeleton'
   import { getRedirectResult, signInWithRedirect, type User } from 'firebase/auth'
   import { writable } from 'svelte/store'
-  import { auth, provider } from '../../lib/v2/firebase'
+  import { auth, provider } from '$lib/v2/firebase'
 
   const userStore = writable<User | null>(null)
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow })
@@ -40,12 +40,23 @@
     <slot />
   {:else}
     <div class="flex fixed inset-0">
-      <button
-        class="btn variant-ghost-surface place-self-center mx-auto"
-        on:click={() => signInWithRedirect(auth, provider)}
-      >
-        Continue with Google
-      </button>
+      <div class="place-self-center mx-auto text-center grid gap-4">
+        <h2 class="text-xl">Play!</h2>
+        <button
+          class="btn variant-ghost-surface"
+          on:click={() => signInWithRedirect(auth, provider)}
+        >
+          Continue with Google
+        </button>
+
+        <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+          <hr />
+          <div>or</div>
+          <hr />
+        </div>
+
+        <a href="/v2/practice" class="btn variant-soft-surface">Just practice</a>
+      </div>
     </div>
   {/if}
 {:catch error}
