@@ -3,7 +3,7 @@
   import { Avatar, ProgressRadial, popup, storePopup } from '@skeletonlabs/skeleton'
   import { getRedirectResult, signInWithRedirect, type User } from 'firebase/auth'
   import { writable } from 'svelte/store'
-  import { auth, provider } from '$lib/v2/firebase'
+  import { auth, provider } from '$lib/firebase'
 
   const userStore = writable<User | null>(null)
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow })
@@ -25,7 +25,7 @@
     </div>
   {/if}
 
-  <div class="flex px-4">
+  <div class="flex p-4">
     {#if $userStore?.photoURL}
       <button
         class="ml-auto"
@@ -55,7 +55,7 @@
           <hr />
         </div>
 
-        <a href="/v2/practice" class="btn variant-soft-surface">Just practice</a>
+        <a href="/practice" class="btn variant-soft-surface">Just practice</a>
       </div>
     </div>
   {/if}
