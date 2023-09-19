@@ -26,12 +26,17 @@
   })
 
   const localWins = derived(metaboard, ($mb) => $mb.map((board) => getLocalWin(board)))
+  const localDraws = derived(metaboard, ($mb) => $mb.map((board) => getLocalDraw(board)))
   const globalWin = derived(localWins, ($localWins) => getGlobalWin($localWins))
-  const currentBoard = derived([lastMove, localWins], ([$lastMove, $localWins]) => {
-    if (!$lastMove) return undefined
-    if ($localWins[$lastMove[2]]) return undefined
-    return $lastMove[2]
-  })
+  const currentBoard = derived(
+    [lastMove, localWins, localDraws],
+    ([$lastMove, $localWins, $localDraws]) => {
+      if (!$lastMove) return undefined
+      if ($localWins[$lastMove[2]]) return undefined
+      if ($localDraws[$lastMove[2]]) return undefined
+      return $lastMove[2]
+    }
+  )
 
   function getLocalWin(board: Board): Player | undefined {
     for (const win of WINS) {
@@ -39,6 +44,10 @@
         return board[win[0]]
     }
     return undefined
+  }
+
+  function getLocalDraw(board: Board): boolean {
+    return board.every((cell) => cell !== undefined)
   }
 
   function getGlobalWin(localWins: (Player | undefined)[]): Player | undefined {
@@ -56,6 +65,7 @@
   function onClick(board: number, cell: number) {
     if ($metaboard[board][cell]) return // Ensure the clicked cell is empty
     if ($localWins[board]) return // Ensure the clicked board is not won
+    if ($localDraws[board]) return // Ensure the clicked board is not a draw
     if ($currentBoard !== undefined && $currentBoard !== board) return // If there's a currentBoard, ensure the clicked board is the correct one
     $moves = [...$moves, [$turn, board, cell]]
     $movesUndone = []
