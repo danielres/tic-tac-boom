@@ -38,6 +38,24 @@
     }
   )
 
+  const legalCells: Readable<[number, number][]> = derived(
+    [globalWin, localWins, localDraws, currentBoard],
+    ([$globalWin, $localWins, $localDraws, $currentBoard]) => {
+      if ($globalWin) return []
+      const arr = []
+      for (let i = 0; i < 9; i++) {
+        if ($currentBoard !== undefined && $currentBoard !== i) continue
+        if ($localWins[i]) continue
+        if ($localDraws[i]) continue
+        for (let j = 0; j < 9; j++) {
+          if ($metaboard[i][j]) continue
+          arr.push([i, j] as [number, number])
+        }
+      }
+      return arr
+    }
+  )
+
   function getLocalWin(board: Board): Player | undefined {
     for (const win of WINS) {
       if (board[win[0]] && board[win[0]] === board[win[1]] && board[win[1]] === board[win[2]])
