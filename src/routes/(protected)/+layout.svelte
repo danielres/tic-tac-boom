@@ -1,12 +1,10 @@
 <script lang="ts">
-  import { arrow, autoUpdate, computePosition, flip, offset, shift } from '@floating-ui/dom'
-  import { Avatar, ProgressRadial, popup, storePopup } from '@skeletonlabs/skeleton'
+  import { auth, provider } from '$lib/firebase'
+  import { Avatar, ProgressRadial, popup } from '@skeletonlabs/skeleton'
   import { getRedirectResult, signInWithRedirect, type User } from 'firebase/auth'
   import { writable } from 'svelte/store'
-  import { auth, provider } from '$lib/firebase'
 
   const userStore = writable<User | null>(null)
-  storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow })
   auth.onAuthStateChanged((user) => userStore.set(user))
 </script>
 
