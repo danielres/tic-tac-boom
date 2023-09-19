@@ -39,7 +39,7 @@
   {#if $userStore}
     <slot />
   {:else}
-    <div class="flex fixed inset-0">
+    <div class="flex py-12">
       <div class="place-self-center mx-auto text-center grid gap-4">
         <h2 class="text-xl">Play!</h2>
         <button
