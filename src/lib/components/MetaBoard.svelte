@@ -115,16 +115,18 @@
   }
 </script>
 
+{#if $globalWin}
+  <div class="ml-auto flex variant-ghost-success place-items-center p-4 gap-4 text-success-300">
+    <span>Winner:</span>
+    <Player player={$globalWin} class="h-6 text-success-100" />
+  </div>
+{:else if $legalCells.length === 0}
+  <div class="variant-ghost-warning p-4 text-warning-300 text-center font-bold">It's a draw!</div>
+{/if}
+
 <button class="" use:popup={{ event: 'click', target: 'popupActions', placement: 'bottom' }}>
   <Icon name="bars-3" size="w-8" />
 </button>
-
-{#if $globalWin}
-  <div class="ml-auto flex variant-ghost-success place-items-center px-4 gap-4">
-    <div class="text-success-300">Winner:</div>
-    <Player player={$globalWin} class="h-6 text-success-100" />
-  </div>
-{/if}
 
 <Stack>
   <Lines class="opacity-20" />
