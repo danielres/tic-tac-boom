@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
-  import MenuTop from '$lib/components/MenuTop.svelte'
   import MetaBoard from '$lib/components/MetaBoard.svelte'
+  import Shell from '$lib/components/Shell.svelte'
   import { getAuth } from '$lib/useAuth'
   import { setMetaboard } from '$lib/useMetaBoard'
 
@@ -11,8 +11,6 @@
   setMetaboard()
 </script>
 
-<MenuTop />
-
-<div class="max-w-xl mx-auto">
+<Shell>
   <MetaBoard />
-</div>
+</Shell>

@@ -1,10 +1,10 @@
 <script lang="ts">
   import { page } from '$app/stores'
-  import MenuBurger from '$lib/components/MenuBurger.svelte'
-  import { getMetaboard } from '$lib/useMetaBoard'
+  import Icon from '$lib/components/Icon.svelte'
+  import MenuBurger from '$lib/components/Shell/MenuBurger.svelte'
   import { getAuth } from '$lib/useAuth'
+  import { getMetaboard } from '$lib/useMetaBoard'
   import { Avatar, popup } from '@skeletonlabs/skeleton'
-  import Icon from './Icon.svelte'
 
   const metaboard = getMetaboard()
   const { signOut, user } = getAuth()
