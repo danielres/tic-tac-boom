@@ -10,7 +10,7 @@
 </script>
 
 <Shell>
-  <div class="text-center grid gap-4 max-w-xs mx-auto py-12">
+  <div slot="content" class="text-center grid gap-4 max-w-xs mx-auto pt-24">
     <h3 class="h3 text-surface-400 tracking-wider">
       <div>Tic Tac Boom!</div>
       <div>💥</div>

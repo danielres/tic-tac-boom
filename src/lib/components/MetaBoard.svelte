@@ -82,7 +82,7 @@
 </Stack>
 
 {#if dev}
-  {JSON.stringify($moves)}
+  <!-- {JSON.stringify($moves)} -->
 {/if}
 
 <style lang="postcss">
