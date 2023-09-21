@@ -1,10 +1,10 @@
 <script lang="ts">
   import { dev } from '$app/environment'
+  import { getMetaboard } from '$lib/useMetaBoard'
   import Lines from './Lines.svelte'
   import Modal from './Modal.svelte'
   import Player from './Player.svelte'
   import Stack from './Stack.svelte'
-  import { getContextMetaboard } from '$lib/useMetaBoard'
 
   const {
     //
@@ -17,7 +17,7 @@
     onClick,
     reset,
     turn,
-  } = getContextMetaboard()
+  } = getMetaboard()
 </script>
 
 {#if $globalWin}

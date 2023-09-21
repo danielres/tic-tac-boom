@@ -1,13 +1,13 @@
 <script lang="ts">
   import { dev } from '$app/environment'
   import Icon from '$lib/components/Icon.svelte'
-  import { getContextMetaboard } from '$lib/useMetaBoard'
+  import { getMetaboard } from '$lib/useMetaBoard'
   import { popup } from '@skeletonlabs/skeleton'
-
-  const { undo, moves, movesUndone, reset, loadGame, redo } = getContextMetaboard()
 
   let _class = ''
   export { _class as class }
+
+  const { undo, moves, movesUndone, reset, loadGame, redo } = getMetaboard()
 </script>
 
 <button class={_class} use:popup={{ event: 'click', target: 'popupActions', placement: 'bottom' }}>

@@ -1,13 +1,13 @@
 import { derived, writable, type Readable, type Writable, get } from 'svelte/store'
 import { getContext, setContext } from 'svelte'
 
-export function setContextMetaboard() {
+export function setMetaboard() {
   const metaboard = useMetaBoard()
   setContext('metaboard', metaboard)
   return metaboard
 }
 
-export function getContextMetaboard(): ReturnType<typeof useMetaBoard> {
+export function getMetaboard(): ReturnType<typeof useMetaBoard> {
   return getContext('metaboard')
 }
 
