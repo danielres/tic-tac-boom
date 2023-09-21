@@ -8,7 +8,7 @@
 
   <!-- Modal -->
   <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-    <div class="flex min-h-full items-end justify-center sm:items-center sm:p-0">
+    <div class="flex min-h-full items-center justify-center sm:items-center sm:p-0">
       <div class="alert {variant} rounded p-8 shadow">
         <div class="text-center space-y-4">
           <slot />
