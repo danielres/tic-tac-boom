@@ -1,11 +1,14 @@
 <script lang="ts">
+  import MenuBurger from '$lib/components/MenuBurger.svelte'
   import { auth, provider } from '$lib/firebase'
+  import { setContextMetaboard } from '$lib/useMetaBoard'
   import { Avatar, ProgressRadial, popup } from '@skeletonlabs/skeleton'
   import { getRedirectResult, signInWithRedirect, type User } from 'firebase/auth'
   import { writable } from 'svelte/store'
 
   const userStore = writable<User | null>(null)
   auth.onAuthStateChanged((user) => userStore.set(user))
+  setContextMetaboard()
 </script>
 
 {#await getRedirectResult(auth)}
@@ -23,12 +26,11 @@
     </div>
   {/if}
 
-  <div class="flex p-4">
+  <div class="flex p-4 gap-4 justify-end">
+    <MenuBurger class="btn-icon variant-soft rounded-full w-12 p-2" />
+
     {#if $userStore?.photoURL}
-      <button
-        class="ml-auto"
-        use:popup={{ event: 'click', target: 'popupFeatured', placement: 'bottom' }}
-      >
+      <button class="" use:popup={{ event: 'click', target: 'popupFeatured', placement: 'bottom' }}>
         <Avatar src={$userStore.photoURL} width="w-12" rounded="rounded-full" />
       </button>
     {/if}

@@ -1,4 +1,15 @@
 import { derived, writable, type Readable, type Writable, get } from 'svelte/store'
+import { getContext, setContext } from 'svelte'
+
+export function setContextMetaboard() {
+  const metaboard = useMetaBoard()
+  setContext('metaboard', metaboard)
+  return metaboard
+}
+
+export function getContextMetaboard(): ReturnType<typeof useMetaBoard> {
+  return getContext('metaboard')
+}
 
 type Player = 'x' | 'o'
 type Board = (undefined | Player)[]
@@ -14,7 +25,7 @@ const DRAW: Move[] = [["o",4,4],["x",4,7],["o",7,5],["x",5,3],["o",3,5],["x",5,4
 //prettier-ignore
 const GAME: Move[] = [["o",4,4],["x",4,7],["o",7,5],["x",5,3],["o",3,5],["x",5,4],["o",4,8],["x",8,3],["o",3,4],["x",4,0],["o",0,4],["x",4,2],["o",2,5],["x",5,5],["o",3,3],["x",4,1],["o",1,7],["x",7,8],["o",8,8],["x",8,2],["o",2,6],["x",6,4],["o",6,5],["x",7,4],["o",7,0],["x",0,8],["o",8,0],["x",0,6],["o",6,8],["x",8,6],["o",6,2],["x",2,4],["o",7,1],["x",1,4],["o",7,2],["x",2,7]]
 
-export function useMetaBoard() {
+function useMetaBoard() {
   const moves: Writable<Move[]> = writable([])
   const movesUndone: Writable<Move[]> = writable([])
 

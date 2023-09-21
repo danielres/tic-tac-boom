@@ -1,29 +1,23 @@
 <script lang="ts">
   import { dev } from '$app/environment'
-  import { popup } from '@skeletonlabs/skeleton'
-  import Icon from './Icon.svelte'
   import Lines from './Lines.svelte'
+  import Modal from './Modal.svelte'
   import Player from './Player.svelte'
   import Stack from './Stack.svelte'
-  import Modal from './Modal.svelte'
-
-  import { useMetaBoard } from '$lib/useMetaBoard'
+  import { getContextMetaboard } from '$lib/useMetaBoard'
 
   const {
+    //
     currentBoard,
     globalWin,
     legalCells,
-    loadGame,
     localWins,
     metaboard,
     moves,
-    movesUndone,
     onClick,
-    redo,
     reset,
     turn,
-    undo,
-  } = useMetaBoard()
+  } = getContextMetaboard()
 </script>
 
 {#if $globalWin}
@@ -45,10 +39,6 @@
     </button>
   </Modal>
 {/if}
-
-<button class="" use:popup={{ event: 'click', target: 'popupActions', placement: 'bottom' }}>
-  <Icon name="bars-3" size="w-8" />
-</button>
 
 <Stack>
   <Lines class="opacity-20" />
@@ -90,23 +80,6 @@
     {/each}
   </div>
 </Stack>
-
-<div class="card p-4 w-72 shadow-xl" data-popup="popupActions">
-  <div class="grid gap-2">
-    <button class="btn variant-ghost" on:click={undo} disabled={!$moves.length}>Undo</button>
-    <button class="btn variant-ghost" on:click={redo} disabled={!$movesUndone.length}>Redo</button>
-    <button class="btn variant-ghost" on:click={() => reset()} disabled={!$moves.length}>
-      Reset
-    </button>
-    {#if dev}
-      <hr class="my-2" />
-      <button class="btn variant-ghost-error" on:click={() => loadGame()}>Load game</button>
-      <button class="btn variant-ghost-error" on:click={() => loadGame('win')}>Load win</button>
-      <button class="btn variant-ghost-error" on:click={() => loadGame('draw')}>Load draw</button>
-    {/if}
-  </div>
-  <div class="arrow bg-surface-100-800-token" />
-</div>
 
 {#if dev}
   {JSON.stringify($moves)}
