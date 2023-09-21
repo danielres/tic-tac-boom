@@ -5,6 +5,7 @@
   import { getAuth } from '$lib/useAuth'
   import { getMetaboard } from '$lib/useMetaBoard'
   import { Avatar, popup } from '@skeletonlabs/skeleton'
+  import Rules from './Rules.svelte'
 
   const metaboard = getMetaboard()
   const { signOut, user } = getAuth()
@@ -18,19 +19,34 @@
   {/if}
 
   <div class="ml-auto flex gap-4">
+    <button
+      class="btn-icon variant-soft rounded-full w-12 p-3"
+      title="Rules"
+      use:popup={{ event: 'click', target: 'popupRules', placement: 'bottom' }}
+    >
+      <div class="text-surface-400">
+        <Icon name="question-mark" size="w-full" strokeWidth={3} />
+      </div>
+    </button>
+
+    <div class="card p-4 w-72 shadow-xl" data-popup="popupRules">
+      <Rules />
+      <div class="arrow bg-surface-100-800-token" />
+    </div>
+
     {#if metaboard}
       <MenuBurger class="btn-icon variant-soft rounded-full w-12 p-2" />
     {/if}
 
     {#if $user?.photoURL}
       <button
-        class="btn-icon"
-        use:popup={{ event: 'click', target: 'popupFeatured', placement: 'bottom' }}
+        class="btn-icon w-12"
+        use:popup={{ event: 'click', target: 'popupAuth', placement: 'bottom' }}
       >
-        <Avatar src={$user.photoURL} width="w-12" rounded="rounded-full" />
+        <Avatar src={$user.photoURL} rounded="rounded-full" />
       </button>
 
-      <div class="card p-4 w-72 shadow-xl" data-popup="popupFeatured">
+      <div class="card p-4 w-72 shadow-xl" data-popup="popupAuth">
         <div class="grid gap-4">
           <h1>{$user.displayName}</h1>
           <button class="btn variant-ghost-surface" on:click={() => signOut()}>Logout</button>
