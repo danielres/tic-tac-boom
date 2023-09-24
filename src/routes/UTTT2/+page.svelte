@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { tick } from 'svelte'
+  import { writable, type Writable } from 'svelte/store'
+
   //prettier-ignore
   const WINS = [ [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6], ]
 
@@ -78,6 +81,125 @@
     if (!isCellAllowed(coordinates)) return
     moves = [...moves, coordinates]
   }
+
+  function evaluateBoard(bigBoard: BigBoard): number {
+    let winner = getBigBoardWinner(bigBoard)
+    if (winner === currentPlayer) return 10
+    if (winner) return -10
+
+    let score = 0
+
+    // Iterate over all small boards
+    for (let i = 0; i < 9; i++) {
+      let smallWinner = getboardWinner(bigBoard[i])
+      if (smallWinner === currentPlayer) score += 3 // AI wins a small board
+      else if (smallWinner) score -= 3 // Opponent wins a small board
+      else if (isTerminal(bigBoard[i])) score -= 1 // Penalty for terminal small board without a winner
+    }
+
+    return score
+  }
+
+  function computeAllowedCells(
+    board: BigBoard,
+    lastMove: CellCoordinates | null
+  ): CellCoordinates[] {
+    const allowedBoards = lastMove
+      ? isTerminal(board[lastMove[1]])
+        ? board.map((_, idx) => idx).filter((i) => !isTerminal(board[i]))
+        : [lastMove[1]]
+      : [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    return board
+      .map((smallBoard, i) => {
+        if (!allowedBoards.includes(i)) return undefined
+        return smallBoard
+          .map((cell, j) => (cell ? undefined : <CellCoordinates>[i, j]))
+          .filter(Boolean)
+      })
+      .filter(Boolean)
+      .flat()
+  }
+
+  function minimax(
+    board: BigBoard,
+    depth: number,
+    isMaximizing: boolean,
+    lastMove: CellCoordinates | null,
+    player: Player,
+    counter: Writable<number>
+  ): number {
+    $counter++
+
+    const allowedCells = computeAllowedCells(board, lastMove)
+    let score = evaluateBoard(board)
+
+    if (depth === 0 || Math.abs(score) === 10) return score
+
+    if (isMaximizing) {
+      let bestScore = -Infinity
+      for (let move of allowedCells) {
+        let tempBoard = structuredClone(board)
+        tempBoard[move[0]][move[1]] = player
+        if (!getboardWinner(tempBoard[move[1]]) && isTerminal(tempBoard[move[1]])) continue
+        let newScore = minimax(
+          tempBoard,
+          depth - 1,
+          !isMaximizing,
+          move,
+          player === 'A' ? 'B' : 'A',
+          counter
+        )
+        bestScore = Math.max(bestScore, newScore)
+      }
+      return bestScore
+    } else {
+      let bestScore = Infinity
+      for (let move of allowedCells) {
+        let tempBoard = structuredClone(board)
+        tempBoard[move[0]][move[1]] = player
+        if (!getboardWinner(tempBoard[move[1]]) && isTerminal(tempBoard[move[1]])) continue
+        let newScore = minimax(
+          tempBoard,
+          depth - 1,
+          !isMaximizing,
+          move,
+          player === 'A' ? 'B' : 'A',
+          counter
+        )
+        bestScore = Math.min(bestScore, newScore)
+      }
+      return bestScore
+    }
+  }
+  let counter = writable(0)
+
+  function AIPlayBestMove() {
+    const allowedCells = computeAllowedCells(
+      bigBoard,
+      moves.length ? moves[moves.length - 1] : null
+    )
+    let bestMove: CellCoordinates | null = null
+    let bestScore = -Infinity
+
+    for (let move of allowedCells) {
+      let tempBoard = structuredClone(bigBoard)
+      tempBoard[move[0]][move[1]] = currentPlayer
+      let currentScore = minimax(
+        tempBoard,
+        4,
+        false,
+        move,
+        currentPlayer === 'A' ? 'B' : 'A',
+        counter
+      )
+      if (currentScore > bestScore) {
+        bestScore = currentScore
+        bestMove = move
+      }
+    }
+
+    if (bestMove) playMove(bestMove)
+  }
 </script>
 
 <pre>Moves: {JSON.stringify(moves)}</pre>
@@ -85,6 +207,7 @@
 <pre>currentPlayer: {currentPlayer}</pre>
 <pre>allowedCells: {JSON.stringify(allowedCells)}</pre>
 <pre>bigBoardWinner: {JSON.stringify(bigBoardWinner)}</pre>
+<pre>counter: {JSON.stringify($counter)}</pre>
 
 <div class="w-1/3 mx-auto">
   <div class="grid grid-cols-3 gap-8">
@@ -97,7 +220,13 @@
             <button
               disabled={!allowedCells.find((ac) => ac?.length && ac[0] === i && ac[1] === j)}
               class="aspect-square"
-              on:click={() => playMove([i, j])}
+              on:click={async () => {
+                playMove([i, j])
+                await tick()
+                console.time('AIPlayBestMove')
+                AIPlayBestMove()
+                console.timeEnd('AIPlayBestMove')
+              }}
             >
               {cell || '-'}
             </button>
