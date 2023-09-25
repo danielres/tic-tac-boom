@@ -1,4 +1,4 @@
-import type { Writable } from 'svelte/store'
+import { derived, get, writable, type Writable } from 'svelte/store'
 
 export type Player = 'A' | 'B'
 export type SmallBoard = (undefined | Player)[]
@@ -7,6 +7,53 @@ export type BigBoard = SmallBoard[]
 
 //prettier-ignore
 export const WINS = [ [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6], ]
+
+export function useUTTT() {
+  const moves = writable<CellCoordinates[]>([])
+  const firstPlayer = writable<Player>('A')
+  const currentPlayer = derived([moves, firstPlayer], ([$m, $fp]) => getCurrentPlayer($m, $fp))
+  const bigBoard = derived([moves, firstPlayer], ([$m, $fp]) => moves2BigBoard($m, $fp))
+  const allowedBoards = derived([moves, firstPlayer], ([$m, $fp]) => moves2AllowedBoards($m, $fp))
+  const bigBoardWinner = derived(bigBoard, getBigBoardWinner)
+  const allowedCells = derived([bigBoard, moves], ([$bigBoard, $moves]) => {
+    const lastMove = $moves.length ? $moves[$moves.length - 1] : null
+    return computeAllowedCells($bigBoard, lastMove)
+  })
+  const counter = writable(0)
+
+  function moves2AllowedBoards(moves: CellCoordinates[], firstPlayer: Player): number[] {
+    const allBoards = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    if (!moves.length) return allBoards
+    const lastMove = moves[moves.length - 1]
+    const bigBoard = moves2BigBoard(moves, firstPlayer)
+    if (getBigBoardWinner(bigBoard)) return []
+    if (isTerminal(bigBoard[lastMove[1]])) return allBoards.filter((i) => !isTerminal(bigBoard[i]))
+    return [lastMove[1]]
+  }
+
+  function isCellAllowed(allowedCells: CellCoordinates[], [i, j]: CellCoordinates) {
+    return allowedCells.find((cell) => cell && cell[0] === i && cell[1] === j)
+  }
+
+  function playMove(coordinates: CellCoordinates) {
+    if (!isCellAllowed(get(allowedCells), coordinates)) return
+    moves.update(($moves) => [...$moves, coordinates])
+  }
+
+  return {
+    moves2AllowedBoards,
+    isCellAllowed,
+    playMove,
+    moves,
+    firstPlayer,
+    currentPlayer,
+    bigBoard,
+    allowedBoards,
+    bigBoardWinner,
+    allowedCells,
+    counter,
+  }
+}
 
 export function getCurrentPlayer(moves: CellCoordinates[], firstPlayer: Player): Player {
   return moves.length % 2 === 0 ? firstPlayer : firstPlayer === 'A' ? 'B' : 'A'
@@ -97,7 +144,6 @@ export function minimax(
   counter.update((c) => c + 1)
 
   const allowedCells = computeAllowedCells(board, lastMove)
-  // console.log(player, currentPlayer)
 
   const score = evaluateBoard(board, currentPlayer)
 
@@ -105,11 +151,11 @@ export function minimax(
 
   if (isMaximizing) {
     let bestScore = -Infinity
-    for (let move of allowedCells) {
+    for (const move of allowedCells) {
       let tempBoard = structuredClone(board)
       tempBoard[move[0]][move[1]] = player
       if (!getboardWinner(tempBoard[move[1]]) && isTerminal(tempBoard[move[1]])) continue
-      let newScore = minimax(
+      const newScore = minimax(
         tempBoard,
         depth - 1,
         !isMaximizing,
@@ -122,11 +168,11 @@ export function minimax(
     return bestScore
   } else {
     let bestScore = Infinity
-    for (let move of allowedCells) {
+    for (const move of allowedCells) {
       let tempBoard = structuredClone(board)
       tempBoard[move[0]][move[1]] = player
       if (!getboardWinner(tempBoard[move[1]]) && isTerminal(tempBoard[move[1]])) continue
-      let newScore = minimax(
+      const newScore = minimax(
         tempBoard,
         depth - 1,
         !isMaximizing,
