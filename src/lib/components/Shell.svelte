@@ -12,5 +12,5 @@
     <MenuTop />
   </div>
 
-  <footer class="text-center text-surface-600 p-4 bg-black/25">FOOTER</footer>
+  <!-- <footer class="text-surface-500 p-2 bg-black/25 flex items-center justify-center" /> -->
 </div>
