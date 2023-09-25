@@ -11,7 +11,7 @@
   const { signOut, user } = getAuth()
 </script>
 
-<div class="flex p-4 gap-4">
+<div class="flex gap-4">
   {#if $page.url.pathname !== '/'}
     <a class="btn-icon variant-soft rounded-full w-12 p-2" href="/" title="Go back">
       <Icon name="arrow-left" size="w-full" />
