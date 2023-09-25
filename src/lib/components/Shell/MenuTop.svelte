@@ -22,15 +22,43 @@
     <button
       class="btn-icon variant-soft rounded-full w-12 p-3"
       title="Rules"
-      use:popup={{ event: 'click', target: 'popupRules', placement: 'bottom' }}
+      use:popup={{ event: 'click', target: 'popupHelp', placement: 'bottom' }}
     >
       <div class="text-surface-400">
         <Icon name="question-mark" size="w-full" strokeWidth={3} />
       </div>
     </button>
 
-    <div class="card p-4 w-72 shadow-xl" data-popup="popupRules">
-      <Rules />
+    <div class="card w-80 shadow-xl" data-popup="popupHelp">
+      <div class="px-4 pt-2 pb-4">
+        <h2 class="text-surface-400 flex justify-between items-baseline">
+          <span>Ultimate Tic Tac Toe</span>
+          <a
+            href="https://en.wikipedia.org/wiki/Ultimate_tic-tac-toe"
+            target="_blank"
+            class="btn-icon text-xs opacity-75 underline mr-4"
+          >
+            <span>Wikipedia</span>
+            <span>
+              <Icon name="arrow-top-right-on-square" size="h-4 -ml-1" />
+            </span>
+          </a>
+        </h2>
+
+        <Rules />
+      </div>
+
+      <div
+        class="grid items-center grid-cols-2 text-center text-sm border-t border-surface-600 bg-black/10"
+      >
+        <span class="opacity-50">by Daniel Reszka</span>
+        <span class="border-l border-surface-600">
+          <a class="btn-icon" href="https://github.com/danielres/tic-tac-boom">
+            <Icon name="github" size="w-8 h-8 fill-surface-500" />
+          </a>
+        </span>
+      </div>
+
       <div class="arrow bg-surface-100-800-token" />
     </div>
 
