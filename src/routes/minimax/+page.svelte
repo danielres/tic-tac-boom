@@ -1,7 +1,25 @@
 <script lang="ts">
   import { tick } from 'svelte'
-  import { getboardWinner, useUTTT, type CellCoordinates } from './utils'
-  import { workerAIFindBestMove } from './AIFindBestMove.worker'
+  import { getboardWinner, useUTTT, type CellCoordinates, type Player } from './utils'
+
+  import AIFindBestMoveWorker from './AIFindBestMove.worker?worker'
+  import type { WorkerResponseData } from './AIFindBestMove.worker'
+
+  const aiFindBestMoveWorker = new AIFindBestMoveWorker()
+
+  export async function workerAIFindBestMove(
+    aiDepth: number,
+    moves: CellCoordinates[],
+    firstPlayer: Player
+  ) {
+    const promise = new Promise((resolve, reject) => {
+      aiFindBestMoveWorker.onmessage = (event) => resolve(event.data)
+      aiFindBestMoveWorker.onerror = (error) => reject(error)
+      aiFindBestMoveWorker.postMessage(JSON.stringify({ aiDepth, moves, firstPlayer }))
+    })
+    const resp = (await promise) as any
+    return JSON.parse(resp) as WorkerResponseData
+  }
 
   const AI_DEPTH = 4
 
