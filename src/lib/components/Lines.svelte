@@ -4,7 +4,7 @@
   export { _class as class }
 </script>
 
-<Stack class={_class}>
+<Stack class="{_class} pointer-events-none">
   <div class="flex justify-between rotate-0">
     <div />
     <div class="line" />
@@ -22,6 +22,6 @@
 
 <style lang="postcss">
   .line {
-    @apply w-1 h-full rounded-full bg-surface-400;
+    @apply w-1 h-full rounded-full bg-surface-300;
   }
 </style>
