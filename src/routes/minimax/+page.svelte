@@ -5,10 +5,19 @@
 
   const AI_DEPTH = 4
 
-  const { playMove, moves, firstPlayer, bigBoardWinner, bigBoard, allowedCells, allowedBoards } =
-    useUTTT()
+  const {
+    playMove,
+    moves,
+    firstPlayer,
+    bigBoardWinner,
+    bigBoard,
+    allowedCells,
+    allowedBoards,
+    currentPlayer,
+  } = useUTTT()
 
   const onClick = async ([i, j]: CellCoordinates) => {
+    if ($currentPlayer !== 'A') return
     playMove([i, j])
     await tick()
 
