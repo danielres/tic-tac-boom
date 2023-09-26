@@ -19,7 +19,6 @@ export function useUTTT() {
     const lastMove = $moves.length ? $moves[$moves.length - 1] : null
     return computeAllowedCells($bigBoard, lastMove)
   })
-  const counter = writable(0)
 
   function moves2AllowedBoards(moves: CellCoordinates[], firstPlayer: Player): number[] {
     const allBoards = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -51,7 +50,6 @@ export function useUTTT() {
     allowedBoards,
     bigBoardWinner,
     allowedCells,
-    counter,
   }
 }
 

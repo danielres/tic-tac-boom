@@ -1,27 +1,21 @@
 <script lang="ts">
   import { tick } from 'svelte'
-  import { AIFindBestMove, getboardWinner, useUTTT, type CellCoordinates } from './utils'
+  import { getboardWinner, useUTTT, type CellCoordinates } from './utils'
+  import { workerAIFindBestMove } from './AIFindBestMove.worker'
 
   const AI_DEPTH = 4
 
-  const {
-    playMove,
-    moves,
-    firstPlayer,
-    counter,
-    bigBoardWinner,
-    bigBoard,
-    allowedCells,
-    allowedBoards,
-  } = useUTTT()
+  const { playMove, moves, firstPlayer, bigBoardWinner, bigBoard, allowedCells, allowedBoards } =
+    useUTTT()
 
   const onClick = async ([i, j]: CellCoordinates) => {
     playMove([i, j])
     await tick()
+
     console.time('AIPlayBestMove')
-    $counter = 0
-    const bestMove = AIFindBestMove(AI_DEPTH, $moves, $firstPlayer, counter)
+    const { data: bestMove, counter } = await workerAIFindBestMove(AI_DEPTH, $moves, $firstPlayer)
     if (bestMove) playMove(bestMove)
+    console.log(counter)
     console.timeEnd('AIPlayBestMove')
   }
 </script>
@@ -29,7 +23,6 @@
 {#if $bigBoardWinner}
   Winner: {$bigBoardWinner}
 {/if}
-{$counter}
 
 <div class="grid grid-cols-3 gap-8">
   {#each $bigBoard as smallBoard, i}
