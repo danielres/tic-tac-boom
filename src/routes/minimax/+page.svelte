@@ -109,8 +109,8 @@
   </div>
 
   {#if $currentPlayer === 'B' && !$bigBoardWinner}
-    <div class="grid place-items-center opacity-5">
-      <ProgressRadial width="w-96" stroke={10} />
+    <div class="grid place-items-center opacity-10">
+      <ProgressRadial width="w-1/2" stroke={10} />
     </div>
   {/if}
 </Stack>
