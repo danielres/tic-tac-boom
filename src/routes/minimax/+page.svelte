@@ -75,7 +75,7 @@
 
   <div class="grid grid-cols-3">
     {#each $bigBoard as smallBoard, i}
-      <Stack class="p-8">
+      <Stack class="p-[10%]">
         <Lines class="{$allowedBoards.includes(i) ? '' : 'opacity-10'} transition-opacity" />
 
         <div class="grid grid-cols-3" class:opacity-10={getboardWinner(smallBoard)}>
@@ -99,7 +99,7 @@
         {#if getboardWinner(smallBoard)}
           <div class="grid place-items-center text-4xl">
             <Mark
-              class="m-6"
+              class=""
               mark={getboardWinner(smallBoard) === 'A' ? $playerAMark : $playerBMark}
             />
           </div>

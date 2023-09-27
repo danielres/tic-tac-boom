@@ -24,7 +24,7 @@
     viewBox="0 0 24 24"
     stroke-width="2.5"
     stroke="currentColor"
-    class="{_class} m-2"
+    class="{_class} m-[10%]"
   >
     <path
       d="M 21 12 C 21 18.928 13.5 23.258 7.5 19.794 C 4.715 18.187 3 15.215 3 12 C 3 5.072 10.5 0.742 16.5 4.206 C 19.285 5.813 21 8.785 21 12 Z"
