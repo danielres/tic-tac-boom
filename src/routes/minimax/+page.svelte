@@ -2,14 +2,15 @@
   import { tick } from 'svelte'
   import { getboardWinner, useUTTT, type CellCoordinates, type Player } from './utils'
 
-  import AIFindBestMoveWorker from './AIFindBestMove.worker?worker'
-  import type { WorkerResponseData } from './AIFindBestMove.worker'
-  import Stack from '$lib/components/Stack.svelte'
-  import { ProgressRadial } from '@skeletonlabs/skeleton'
+  import { dev } from '$app/environment'
   import Lines from '$lib/components/Lines.svelte'
   import Mark from '$lib/components/Mark.svelte'
+  import Stack from '$lib/components/Stack.svelte'
+  import { ProgressRadial } from '@skeletonlabs/skeleton'
   import { derived, writable, type Readable } from 'svelte/store'
   import { fade } from 'svelte/transition'
+  import type { WorkerResponseData } from './AIFindBestMove.worker'
+  import AIFindBestMoveWorker from './AIFindBestMove.worker?worker'
 
   const aiFindBestMoveWorker = new AIFindBestMoveWorker()
 
@@ -67,9 +68,13 @@
 {#if $bigBoardWinner}
   Winner: {$bigBoardWinner}
 {/if}
-<div class="absolute opacity-10">
-  {JSON.stringify($moves)}
-</div>
+
+{#if dev}
+  <div class="absolute opacity-10">
+    {JSON.stringify($moves)}
+  </div>
+{/if}
+
 <Stack>
   <Lines class="opacity-25" />
 
