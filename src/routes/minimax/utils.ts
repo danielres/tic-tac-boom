@@ -138,50 +138,29 @@ export function minimax(
   player: Player,
   counter: Writable<number>
 ): number {
-  const currentPlayer = player === 'A' ? 'B' : 'A'
   counter.update((c) => c + 1)
 
   const allowedCells = computeAllowedCells(board, lastMove)
-
-  const score = evaluateBoard(board, currentPlayer)
+  const score = evaluateBoard(board, player === 'A' ? 'B' : 'A')
 
   if (depth === 0 || Math.abs(score) === 10) return score
 
-  if (isMaximizing) {
-    let bestScore = -Infinity
-    for (const move of allowedCells) {
-      let tempBoard = structuredClone(board)
-      tempBoard[move[0]][move[1]] = player
-      if (!getboardWinner(tempBoard[move[1]]) && isTerminal(tempBoard[move[1]])) continue
-      const newScore = minimax(
-        tempBoard,
-        depth - 1,
-        !isMaximizing,
-        move,
-        player === 'A' ? 'B' : 'A',
-        counter
-      )
-      bestScore = Math.max(bestScore, newScore)
-    }
-    return bestScore
-  } else {
-    let bestScore = Infinity
-    for (const move of allowedCells) {
-      let tempBoard = structuredClone(board)
-      tempBoard[move[0]][move[1]] = player
-      if (!getboardWinner(tempBoard[move[1]]) && isTerminal(tempBoard[move[1]])) continue
-      const newScore = minimax(
-        tempBoard,
-        depth - 1,
-        !isMaximizing,
-        move,
-        player === 'A' ? 'B' : 'A',
-        counter
-      )
-      bestScore = Math.min(bestScore, newScore)
-    }
-    return bestScore
+  let bestScore = isMaximizing ? -Infinity : Infinity
+
+  const evaluateMove = (move: CellCoordinates, tempBoard: BigBoard) => {
+    tempBoard[move[0]][move[1]] = player
+    if (getboardWinner(tempBoard[move[1]]) && isTerminal(tempBoard[move[1]])) return bestScore
+    return minimax(tempBoard, depth - 1, !isMaximizing, move, player === 'A' ? 'B' : 'A', counter)
   }
+
+  for (const move of allowedCells) {
+    let tempBoard = structuredClone(board)
+    const newScore = evaluateMove(move, tempBoard)
+
+    bestScore = isMaximizing ? Math.max(bestScore, newScore) : Math.min(bestScore, newScore)
+  }
+
+  return bestScore
 }
 
 function evaluateBoard(bigBoard: BigBoard, currentPlayer: Player): number {
