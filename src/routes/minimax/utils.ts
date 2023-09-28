@@ -136,7 +136,9 @@ export function minimax(
   isMaximizing: boolean,
   lastMove: CellCoordinates | null,
   player: Player,
-  counter: Writable<number>
+  counter: Writable<number>,
+  alpha: number = -Infinity,
+  beta: number = Infinity
 ): number {
   counter.update((c) => c + 1)
 
@@ -150,14 +152,36 @@ export function minimax(
   const evaluateMove = (move: CellCoordinates, tempBoard: BigBoard) => {
     tempBoard[move[0]][move[1]] = player
     if (getboardWinner(tempBoard[move[1]]) && isTerminal(tempBoard[move[1]])) return bestScore
-    return minimax(tempBoard, depth - 1, !isMaximizing, move, player === 'A' ? 'B' : 'A', counter)
+    return minimax(
+      tempBoard,
+      depth - 1,
+      !isMaximizing,
+      move,
+      player === 'A' ? 'B' : 'A',
+      counter,
+      alpha,
+      beta
+    )
   }
 
   for (const move of allowedCells) {
     let tempBoard = structuredClone(board)
     const newScore = evaluateMove(move, tempBoard)
 
-    bestScore = isMaximizing ? Math.max(bestScore, newScore) : Math.min(bestScore, newScore)
+    // For Maximizing Player
+    if (isMaximizing) {
+      bestScore = Math.max(bestScore, newScore)
+      alpha = Math.max(alpha, bestScore)
+    } else {
+      // For Minimizing Player
+      bestScore = Math.min(bestScore, newScore)
+      beta = Math.min(beta, bestScore)
+    }
+
+    // Alpha Beta Pruning
+    if (beta <= alpha) {
+      break
+    }
   }
 
   return bestScore
