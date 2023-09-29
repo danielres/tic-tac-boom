@@ -16,7 +16,7 @@ function computeResponse(eventData: WorkerEventData) {
   const counter = writable(0)
 
   const startTime = Date.now()
-  const timeLimit = 7500 // Adjust time limit
+  const timeLimit = 4500 // Adjust time limit
   let depth = 1
   let bestMove
 
