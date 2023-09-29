@@ -1,28 +1,26 @@
 <script lang="ts">
-  import { tick } from 'svelte'
-  import { getboardWinner, useUTTT, type CellCoordinates, type Player } from './utils'
-
   import { dev } from '$app/environment'
   import Lines from '$lib/components/Lines.svelte'
   import Mark from '$lib/components/Mark.svelte'
   import Stack from '$lib/components/Stack.svelte'
+  import { getRandomCellCoordinates, type CellCoordinates, type Player } from '$lib/utils/board'
+  import { delay } from '$lib/utils/promise'
   import { ProgressRadial } from '@skeletonlabs/skeleton'
+  import { onMount, tick } from 'svelte'
   import { derived, writable, type Readable } from 'svelte/store'
   import { fade } from 'svelte/transition'
-  import type { WorkerResponseData } from './AIFindBestMove.worker'
+  import type { WorkerEventData, WorkerResponseData } from './AIFindBestMove.worker'
   import AIFindBestMoveWorker from './AIFindBestMove.worker?worker'
+  import { getboardWinner, useUTTT } from './useUTTT'
 
   const aiFindBestMoveWorker = new AIFindBestMoveWorker()
 
-  export async function workerAIFindBestMove(
-    aiDepth: number,
-    moves: CellCoordinates[],
-    firstPlayer: Player
-  ) {
+  export async function workerAIFindBestMove(moves: CellCoordinates[], firstPlayer: Player) {
     const promise = new Promise((resolve, reject) => {
       aiFindBestMoveWorker.onmessage = (event) => resolve(event.data)
       aiFindBestMoveWorker.onerror = (error) => reject(error)
-      aiFindBestMoveWorker.postMessage(JSON.stringify({ aiDepth, moves, firstPlayer }))
+      const data: WorkerEventData = { moves, firstPlayer }
+      aiFindBestMoveWorker.postMessage(JSON.stringify(data))
     })
     const resp = (await promise) as any
     return JSON.parse(resp) as WorkerResponseData
@@ -34,6 +32,8 @@
   const GAME_ONGOING: CellCoordinates[] = [ [4, 4], [4, 0], [0, 8], [8, 0], [0, 0], [0, 1], [1, 6], [6, 1], [1, 2], [2, 2], [2, 5], [5, 2], [2, 3], [3, 3], [3, 2], [2, 4], [4, 6], [6, 2], [2, 8], [8, 2], [2, 7], [7, 3], [3, 0], [0, 4], [4, 2], [2, 6], ]
   // prettier-ignore
   const GAME_ALMOST_WON: CellCoordinates[] = [ [4, 4], [4, 0], [0, 8], [8, 0], [0, 0], [0, 1], [1, 6], [6, 1], [1, 2], [2, 2], [2, 5], [5, 2], [2, 3], [3, 3], [3, 2], [2, 4], [4, 6], [6, 2], [2, 8], [8, 2], [2, 7], [7, 3], [3, 0], [0, 4], [4, 2], [2, 6], [6, 0], [0, 7], [7, 5], [5, 1], [1, 4], [5, 0], [7, 7], [7, 6], [6, 6], [6, 7], [7, 4], [3, 6], [6, 3], [3, 7], ]
+  // prettier-ignore
+  const GAME_SLOW_COMPUTE: CellCoordinates[] = [[0,8],[8,0],[0,6],[6,1],[1,2],[2,1],[1,8],[8,2],[2,5],[5,2],[2,3],[3,3],[3,7],[7,3],[3,4],[4,4],[4,6],[6,4],[4,5],[5,4],[4,2],[2,4],[4,8],[8,1],[1,3],[3,1],[1,5],[5,3],[3,6],[6,7],[7,7],[7,2]]
 
   const {
     playMove,
@@ -44,6 +44,8 @@
     allowedCells,
     allowedBoards,
     currentPlayer,
+    resetGame,
+    switchFirstPlayer,
   } = useUTTT()
 
   const onClick = async ([i, j]: CellCoordinates) => {
@@ -51,22 +53,41 @@
     playMove([i, j])
 
     await tick()
+    if (dev) console.time('AIPlayBestMove')
     if ($bigBoardWinner) return
-    console.time('AIPlayBestMove')
-    const { data: bestMove, counter } = await workerAIFindBestMove(AI_DEPTH, $moves, $firstPlayer)
+    const { data: bestMove, counter } = await workerAIFindBestMove($moves, $firstPlayer)
     if (bestMove) playMove(bestMove)
-    console.log(counter)
-    console.timeEnd('AIPlayBestMove')
+    if (dev) console.log(counter)
+    if (dev) console.timeEnd('AIPlayBestMove')
   }
 
   const playerAMark = writable<'x' | 'o'>('x')
   const playerBMark: Readable<'x' | 'o'> = derived(playerAMark, ($playerAMark) =>
     $playerAMark === 'x' ? 'o' : 'x'
   )
+
+  onMount(async () => {
+    if ($firstPlayer !== 'B') return
+    await delay(1000)
+    playMove(getRandomCellCoordinates())
+  })
 </script>
 
 {#if $bigBoardWinner}
   Winner: {$bigBoardWinner}
+
+  <button
+    class="btn variant-ghost-primary"
+    on:click={async () => {
+      resetGame()
+      switchFirstPlayer()
+      if ($firstPlayer !== 'B') return
+      await delay(1000)
+      playMove(getRandomCellCoordinates())
+    }}
+  >
+    Play again
+  </button>
 {/if}
 
 {#if dev}

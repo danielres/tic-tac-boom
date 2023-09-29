@@ -1,9 +1,12 @@
-import { get, writable } from 'svelte/store'
-import { AIFindBestMove, type CellCoordinates, type Player } from './utils'
+import type { CellCoordinates, Player } from '$lib/utils/board';
+import { get, writable } from 'svelte/store';
+import { AIFindBestMove } from './useUTTT';
 
 // Webworker --------------------------------------------------------------------------------------
-export type WorkerEventData = { aiDepth: number; moves: CellCoordinates[]; firstPlayer: Player }
+export type WorkerEventData = { moves: CellCoordinates[]; firstPlayer: Player }
 export type WorkerResponseData = ReturnType<typeof computeResponse>
+
+const TIME_LIMIT = 3500
 
 onmessage = (event) => {
   const eventData = JSON.parse(event.data) as WorkerEventData
@@ -12,11 +15,11 @@ onmessage = (event) => {
 }
 
 function computeResponse(eventData: WorkerEventData) {
-  const { aiDepth, moves, firstPlayer } = eventData
+  const { moves, firstPlayer } = eventData
   const counter = writable(0)
 
   const startTime = Date.now()
-  const timeLimit = 4500 // Adjust time limit
+  const timeLimit = TIME_LIMIT
   let depth = 1
   let bestMove
 
@@ -27,6 +30,7 @@ function computeResponse(eventData: WorkerEventData) {
     const move = AIFindBestMove(depth, moves, firstPlayer, counter)
     if (move) bestMove = move // Update bestMove if a move is found
     depth++ // Increase depth for the next iteration
+    console.log('depth', depth)
   }
 
   const response = { data: bestMove, counter: get(counter) }
